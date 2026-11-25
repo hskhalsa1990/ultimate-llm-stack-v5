@@ -1,0 +1,20 @@
+apiVersion: ray.io/v1
+kind: RayService
+metadata:
+  name: vllm-dpo-70b
+spec:
+  serveConfigV2: |
+    applications:
+    - name: dpo-70b-inference
+      route_prefix: /v1
+      import_path: vllm.entrypoints.api_server:app
+      deployments:
+      - name: VLLMDeployment
+        num_replicas: 4
+        ray_actor_options:
+          num_gpus: 1
+        user_config:
+          model: /models/llama2-70b-dpo
+          tensor_parallel_size: 4
+          max_num_seqs: 256
+          max_model_len: 32768

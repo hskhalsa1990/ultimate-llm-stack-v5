@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: llm-stack-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/company/llm-stack
+    targetRevision: HEAD
+    path: .
+    helm:
+      valueFiles:
+        - helm_values.yaml
+      parameters:
+        - name: replicaCount
+          value: "4"
+        - name: vllm.tensorParallelSize
+          value: "4"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: llm-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: llm-stack
+  namespace: argocd
+spec:
+  description: LLM Stack Production
+  sourceRepos:
+    - https://github.com/company/llm-stack
+  destinations:
+    - namespace: llm-prod
+      server: https://kubernetes.default.svc
+    - namespace: llm-staging
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace

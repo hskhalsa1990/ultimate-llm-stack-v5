@@ -1,0 +1,74 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: llm-pod-delete-chaos
+  namespace: llm-prod
+spec:
+  appinfo:
+    appns: llm-prod
+    applabel: "app=vllm-dpo"
+    appkind: deployment
+  chaosServiceAccount: litmus-admin
+  experiments:
+    - name: pod-delete
+      spec:
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: '60'
+            - name: CHAOS_INTERVAL
+              value: '10'
+            - name: FORCE
+              value: 'false'
+---
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: llm-network-latency
+spec:
+  appinfo:
+    appns: llm-prod
+    applabel: "app=vllm-dpo"
+  experiments:
+    - name: pod-network-latency
+      spec:
+        components:
+          env:
+            - name: NETWORK_LATENCY
+              value: '2000'  # 2s latency
+            - name: DESTINATION_IPS
+              value: '0.0.0.0/0'
+---
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: llm-cpu-hog
+spec:
+  appinfo:
+    appns: llm-prod
+    applabel: "app=vllm-dpo"
+  experiments:
+    - name: pod-cpu-hog
+      spec:
+        components:
+          env:
+            - name: CPU_CORES
+              value: '4'
+            - name: TOTAL_CHAOS_DURATION
+              value: '120'
+---
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: llm-memory-hog
+spec:
+  appinfo:
+    appns: llm-prod
+    applabel: "app=vllm-dpo"
+  experiments:
+    - name: pod-memory-hog
+      spec:
+        components:
+          env:
+            - name: MEMORY_CONSUMPTION
+              value: '10000'  # 10GB

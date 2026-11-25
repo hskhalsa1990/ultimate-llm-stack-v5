@@ -1,0 +1,19 @@
+site_name: Ultimate LLM Stack Docs
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - 3D Diagrams: diagrams.md
+  - Deployment: deployment.md
+  - Benchmarks: benchmarks.md
+  - API: api.md
+
+plugins:
+  - search
+  - mkdocstrings

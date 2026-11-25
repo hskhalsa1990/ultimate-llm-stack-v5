@@ -1,0 +1,43 @@
+_format_version: "3.0"
+
+services:
+  - name: vllm-inference
+    url: http://vllm-service:8000
+    routes:
+      - name: chat-completions
+        paths: [/v1/chat/completions]
+        methods: [POST]
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 1000
+          policy: redis
+      - name: key-auth
+      - name: prometheus
+      - name: correlation-id
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - X-LLM-Model:llama2-70b-dpo
+      
+  - name: benchmark-api
+    url: http://benchmark-service:8080
+    routes:
+      - name: benchmark
+        paths: [/v1/benchmark]
+    plugins:
+      - name: key-auth
+      - name: acl
+        config:
+          allow: [admin, researcher]
+
+consumers:
+  - username: ml-team
+    keyauth_credentials:
+      - key: sk-ml-team-12345
+  - username: research-team
+    keyauth_credentials:
+      - key: sk-research-67890
+    acls:
+      - admin

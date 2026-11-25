@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "title": "LLM Stack 3D Monitoring",
+    "panels": [
+      {
+        "title": "Tokens/Sec - FlashDecoding",
+        "type": "graph",
+        "targets": [{"expr": "rate(vllm_tokens_total[1m])"}],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "title": "KV Cache Usage - Paged vLLM",
+        "type": "stat",
+        "targets": [{"expr": "vllm_kv_cache_usage_bytes / vllm_kv_cache_total_bytes"}],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "title": "GPU Memory - FSDP Sharding",
+        "type": "heatmap",
+        "targets": [{"expr": "nvidia_gpu_memory_used_bytes"}],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "title": "MoE Expert Load Balance",
+        "type": "bargauge",
+        "targets": [{"expr": "moe_expert_token_count"}],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "title": "Ring Attention 1M Latency",
+        "type": "graph",
+        "targets": [{"expr": "histogram_quantile(0.99, ring_attention_latency_seconds)"}],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      }
+    ]
+  }
+}
